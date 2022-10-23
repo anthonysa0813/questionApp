@@ -5,20 +5,25 @@ import { db } from "./firebase/config";
 import { QuestionResponse } from "./interfaces";
 import { collection, DocumentData, getDocs } from "firebase/firestore";
 import QuestionCard from "./component/QuestionCard";
+import Modal from "./component/ModalComponet";
+import ShowInfo from "./component/ShowInfo";
 
 function App() {
   const [questionList, setQuestionList] = useState<
     QuestionResponse[] | DocumentData
   >([]);
+  const [counter, setCounter] = useState(1);
+  const [totalScore, setTotalScore] = useState(0);
+  const [showModalLinks, setShowModalLinks] = useState(false);
 
   // va a controlar si se muestra la pregunta
-  const [qa1, setQa1] = useState(true);
-  const [qa2, setQa2] = useState(false);
-  const [qa3, setQa3] = useState(false);
-  const [qa4, setQa4] = useState(false);
-  const [qa5, setQa5] = useState(false);
-  const [qa6, setQa6] = useState(false);
-  const [qa7, setQa7] = useState(false);
+  const [qa1, setQa1] = useState(1);
+  const [qa2, setQa2] = useState(0);
+  const [qa3, setQa3] = useState(0);
+  const [qa4, setQa4] = useState(0);
+  const [qa5, setQa5] = useState(0);
+  const [qa6, setQa6] = useState(0);
+  const [qa7, setQa7] = useState(0);
   // va a guardar la pregunta {options, question, answer}
   const [question1, setQuestion1] = useState<QuestionResponse>(
     {} as QuestionResponse
@@ -67,20 +72,41 @@ function App() {
     }
   }, [questionList]);
 
+  const showNextQa = () => {
+    setCounter((state) => state + 1);
+  };
+
   return (
     <QuestionGrid className="">
       <h1>
         ¡Bienvenido a nuestro cuestionario sobre...
         <span>La inclusión de las mujeres en el mundo TECH</span>!
       </h1>
+      {showModalLinks && (
+        <Modal>
+          <ShowInfo setShowModalLinks={setShowModalLinks} />
+        </Modal>
+      )}
       <div className="alert">
         <CiWarning />
         Te recomendamos antes de desarrollar el cuestionario, leer los
         siguientes blogs{" "}
-        <span className="readBlog"> click para ver los blogs</span>
+        <span className="readBlog" onClick={() => setShowModalLinks(true)}>
+          {" "}
+          click para ver los blogs
+        </span>
       </div>
+
+      <h1>Score: {totalScore}</h1>
       <div className="questionListByOne">
-        {qa1 && <QuestionCard questionObject={question1} />}
+        {questionList.map((question: QuestionResponse) => {
+          return (
+            <QuestionCard
+              questionObject={question}
+              setTotalScore={setTotalScore}
+            />
+          );
+        })}
       </div>
     </QuestionGrid>
   );
